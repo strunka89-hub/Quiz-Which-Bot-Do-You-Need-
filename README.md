@@ -45,9 +45,35 @@ npm run preview
 
 Файл `.env`:
 
-| Переменная | Обязательность | Назначение |
-| --- | --- | --- |
-| `VITE_WEBHOOK_URL` | опционально | URL, на который уходит `POST application/json` с лидом. Если пусто — лид сохраняется в `localStorage` + пишется в консоль (удобно для локальной отладки, но в production обязательно задавайте). |
+| Переменная | Где | Обязательность | Назначение |
+| --- | --- | --- | --- |
+| `VITE_WEBHOOK_URL` | фронт (public) | опционально | URL, на который фронт шлёт `POST application/json` с лидом. По умолчанию — `/api/lead` (встроенная serverless-функция, отправляющая заявку в Telegram-бота). |
+| `TELEGRAM_BOT_TOKEN` | сервер (secret) | обязательно для Telegram | Токен бота от [@BotFather](https://t.me/BotFather). |
+| `TELEGRAM_CHAT_ID` | сервер (secret) | обязательно для Telegram | ID чата, куда бот шлёт заявки. |
+
+Если `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` не заданы — serverless-функция
+отвечает ошибкой, и фронт автоматически сохраняет лид в `localStorage`
+(fallback — см. ниже). Для production обязательно задавайте токен и
+chat_id, иначе заявки до вас не дойдут.
+
+---
+
+## Заявки в Telegram
+
+Заявки из квиза приходят вам в личный Telegram через бота. Ничего
+программировать не нужно — понадобится только создать бота в @BotFather
+и добавить два значения в Vercel.
+
+**Пошаговая инструкция (≈5 минут):** [TELEGRAM-BOT-SETUP.md](TELEGRAM-BOT-SETUP.md)
+
+Коротко:
+
+1. Создайте бота в [@BotFather](https://t.me/BotFather) → получите `TELEGRAM_BOT_TOKEN`.
+2. Напишите боту `/start` и откройте `https://api.telegram.org/bot<ТОКЕН>/getUpdates`
+   → возьмите `chat.id` → это `TELEGRAM_CHAT_ID`.
+3. В Vercel → **Settings → Environment Variables** добавьте обе
+   переменные и `VITE_WEBHOOK_URL=/api/lead`.
+4. Redeploy. Готово — сообщение прилетает в Telegram за 1–2 секунды.
 
 ---
 
@@ -185,6 +211,9 @@ npm run preview
 ├── vercel.json                 # SPA-fallback для Vercel
 ├── .env.example
 ├── VK-INTEGRATION.md           # пошаговая инструкция по ВК
+├── TELEGRAM-BOT-SETUP.md       # как получать заявки в Telegram
+├── api/
+│   └── lead.ts                 # serverless: POST /api/lead → Telegram
 ├── public/
 │   ├── favicon.svg
 │   ├── og-cover.png            # превью ссылки 1200×630
