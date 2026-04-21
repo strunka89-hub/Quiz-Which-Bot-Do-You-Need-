@@ -124,13 +124,15 @@ export function LeadScreen({ onBack, onSubmit }: Props) {
             enterKeyHint="next"
           />
           <FormField
-            label="Telegram или WhatsApp"
-            placeholder="@username или +7 999 000-00-00"
+            label="Номер телефона"
+            placeholder="+7 999 000-00-00"
             value={contact}
             onChange={handleContactChange}
             onBlur={() => setTouched((t) => ({ ...t, contact: true }))}
             error={contactError}
             autoComplete="tel"
+            inputMode="tel"
+            type="tel"
             name="contact"
             disabled={loading}
             enterKeyHint="done"
