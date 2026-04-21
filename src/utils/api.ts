@@ -49,16 +49,12 @@ function buildPayload(lead: Lead): LeadPayload {
   };
 }
 
-export async function sendLead(lead: Lead): Promise<SendLeadResult> {
-  const url = import.meta.env.VITE_WEBHOOK_URL as string | undefined;
-  const payload = buildPayload(lead);
+const DEFAULT_WEBHOOK_URL = '/api/lead';
 
-  if (!url) {
-    // eslint-disable-next-line no-console
-    console.info('[quiz] VITE_WEBHOOK_URL не задан, лид сохранён локально:', payload);
-    saveLeadLocally(payload);
-    return { ok: true, fallback: 'local' };
-  }
+export async function sendLead(lead: Lead): Promise<SendLeadResult> {
+  const envUrl = import.meta.env.VITE_WEBHOOK_URL as string | undefined;
+  const url = envUrl && envUrl.trim() ? envUrl.trim() : DEFAULT_WEBHOOK_URL;
+  const payload = buildPayload(lead);
 
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     saveLeadLocally(payload);
