@@ -10,24 +10,18 @@ export function validateName(value: string): string | undefined {
   return undefined;
 }
 
-const TG_USERNAME_RE = /^@?[a-zA-Z][a-zA-Z0-9_]{3,31}$/;
-const TG_LINK_RE = /^https?:\/\/(t\.me|telegram\.me)\/[a-zA-Z][a-zA-Z0-9_]{3,31}$/;
 const PHONE_RE = /^[+]?\d[\d\s\-()]{7,19}$/;
-const WA_LINK_RE = /^https?:\/\/(wa\.me|api\.whatsapp\.com)\/.+/;
 
 export function validateContact(value: string): string | undefined {
   const v = value.trim();
-  if (!v) return 'Укажите Telegram или WhatsApp';
-
-  if (
-    TG_USERNAME_RE.test(v) ||
-    TG_LINK_RE.test(v) ||
-    PHONE_RE.test(v) ||
-    WA_LINK_RE.test(v)
-  ) {
-    return undefined;
+  if (!v) return 'Укажите номер телефона';
+  if (!PHONE_RE.test(v)) {
+    return 'Например: +7 999 000-00-00';
   }
-  return 'Например: @username или +7 999 000-00-00';
+  const digits = v.replace(/\D/g, '');
+  if (digits.length < 10) return 'Слишком короткий номер';
+  if (digits.length > 15) return 'Слишком длинный номер';
+  return undefined;
 }
 
 export function validateLeadForm(name: string, contact: string): LeadFormErrors {
